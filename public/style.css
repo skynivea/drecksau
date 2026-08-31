@@ -1,0 +1,30 @@
+body { margin: 0; font-family: 'Malgun Gothic', sans-serif; background-color: #f0f8ff; overflow: hidden; }
+#lobby { text-align: center; margin-top: 20%; }
+#game-board { display: flex; flex-direction: column; justify-content: space-between; height: 100vh; position: relative; }
+#room-info { position: absolute; top: 10px; right: 20px; font-weight: bold; }
+
+/* 중앙 카드 팝업 효과 */
+#center-area {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; gap: 20px; align-items: center;
+}
+#played-card-display {
+    width: 150px; height: 210px;
+    border: 3px solid gold; box-shadow: 0 0 20px gold; /* 강조 이펙트 */
+    transition: all 0.3s ease;
+    background-color: #fff;
+    display: flex; justify-content: center; align-items: center; font-weight: bold;
+}
+
+/* 카드 기본 스타일 */
+.card {
+    width: 100px; height: 140px; border: 1px solid #ccc; border-radius: 8px;
+    background-size: cover; cursor: pointer; display: inline-block; margin: 5px;
+}
+.card:hover { transform: translateY(-10px); }
+.card-back { background-image: url('images/card_back.jpg'); /* 세 번째 사진 뒷면 이미지 경로 */ }
+
+/* 영역 배치 */
+#my-area { text-align: center; padding: 20px; background-color: rgba(0,0,0,0.1); }
+.pig-zone { margin-bottom: 10px; }
+.hand-zone { display: flex; justify-content: center; }

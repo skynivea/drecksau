@@ -3,6 +3,7 @@ let myRoomCode = '';
 let myId = '';
 let myNickname = '';
 let selectedCardIdx = null;
+let toastTimeout = null;
 
 function createRoom() {
     const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -33,29 +34,24 @@ function startGame() {
     socket.emit('startGame', myRoomCode);
 }
 
-// 핸드 카드 선택
 function selectCard(idx, cardName) {
     selectedCardIdx = idx;
     
-    // 비 카드는 단독 즉시 발동
     if (cardName === 'rain') {
         socket.emit('playCard', { roomCode: myRoomCode, cardIdx: idx });
         selectedCardIdx = null;
         return;
     }
 
-    // 카드 선택 비주얼 반영
     const handCards = document.querySelectorAll('#my-hand .card');
     handCards.forEach((c, i) => {
         if (i === idx) c.classList.add('selected');
         else c.classList.remove('selected');
     });
 
-    // 타겟 돼지 카드에 선택 가능 가시성 클래스 추가
     document.querySelectorAll('.pig-container').forEach(el => el.classList.add('target-selectable'));
 }
 
-// Target 돼지 클릭
 function selectTargetPig(targetPlayerId, targetPigIdx) {
     if (selectedCardIdx === null) {
         alert('먼저 손에서 낼 카드를 선택하세요!');
@@ -78,12 +74,10 @@ function discardHand() {
     selectedCardIdx = null;
 }
 
-// 1. 가로 돼지 카드 렌더링
 function renderPigElement(pig, ownerId, pigIdx) {
     const container = document.createElement('div');
     container.className = 'pig-container' + (selectedCardIdx !== null ? ' target-selectable' : '');
     
-    // 이벤트 바인딩
     container.onclick = (e) => {
         e.stopPropagation();
         selectTargetPig(ownerId, pigIdx);
@@ -115,7 +109,6 @@ function renderPigElement(pig, ownerId, pigIdx) {
     return container;
 }
 
-// 5. 실시간 채팅 기능
 function sendChat() {
     const input = document.getElementById('chatInput');
     const message = input.value;
@@ -124,6 +117,29 @@ function sendChat() {
         input.value = '';
     }
 }
+
+// 상단 행동 알림 팝업 및 채팅 로그 출력
+socket.on('actionNotice', (data) => {
+    // 1. Toast 팝업 연출
+    const toastElem = document.getElementById('action-toast');
+    const toastText = document.getElementById('toast-text');
+    toastText.innerText = data.message;
+
+    toastElem.classList.remove('toast-hidden');
+
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toastElem.classList.add('toast-hidden');
+    }, 2200);
+
+    // 2. 채팅창 행동 기록 추가
+    const chatMsgs = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-msg action-log';
+    msgDiv.innerText = data.message;
+    chatMsgs.appendChild(msgDiv);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+});
 
 socket.on('receiveChat', ({ sender, message }) => {
     const chatMsgs = document.getElementById('chat-messages');
@@ -139,11 +155,9 @@ socket.on('gameStarted', () => {
     document.getElementById('game-board').style.display = 'flex';
 });
 
-// 전체 실시간 상태 동기화
 socket.on('updateState', (room) => {
     myId = socket.id;
     
-    // 대기실 유저 목록 반영
     document.getElementById('player-count').innerText = room.players.length;
     const playerListDiv = document.getElementById('waiting-player-list');
     playerListDiv.innerHTML = '';
@@ -154,7 +168,6 @@ socket.on('updateState', (room) => {
         playerListDiv.appendChild(chip);
     });
 
-    // 방장 버튼 제어
     const startBtn = document.getElementById('start-btn');
     const hostNotice = document.getElementById('host-notice');
     if (room.hostId === myId) {
@@ -165,12 +178,10 @@ socket.on('updateState', (room) => {
         hostNotice.innerText = '방장이 게임을 시작할 때까지 대기하세요.';
     }
 
-    // 게임 진행 중일 때 UI
     if (room.isStarted) {
         document.getElementById('waiting-room').style.display = 'none';
         document.getElementById('game-board').style.display = 'flex';
 
-        // 2 & 4. 직관적인 턴 배너 및 닉네임 표시
         const currentTurnPlayer = room.players[room.turn];
         const isMyTurn = currentTurnPlayer && currentTurnPlayer.id === myId;
         const turnBanner = document.getElementById('turn-banner');
@@ -183,7 +194,6 @@ socket.on('updateState', (room) => {
             turnBanner.className = 'turn-banner turn-other-turn';
         }
 
-        // 상대방 카드 구역
         const oppArea = document.getElementById('opponents-area');
         oppArea.innerHTML = '';
         room.players.forEach((player, idx) => {
@@ -203,7 +213,6 @@ socket.on('updateState', (room) => {
             }
         });
 
-        // 내 상태 구역
         const me = room.players.find(p => p.id === myId);
         if (me) {
             document.getElementById('my-name-display').innerText = `내 돼지 (${me.nickname})`;
@@ -224,7 +233,6 @@ socket.on('updateState', (room) => {
             });
         }
 
-        // 중앙 놓인 카드
         const centerDisplay = document.getElementById('played-card-display');
         if (room.centerCard) {
             if (room.centerCard === 'discard_all') {

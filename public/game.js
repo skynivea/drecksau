@@ -15,10 +15,11 @@ function joinRoom() {
     const rawInput = document.getElementById('roomInput').value;
     const nickInput = document.getElementById('nicknameInput').value;
     
+    // 모든 공백 제거 및 대문자 변환
+    myRoomCode = rawInput.replace(/\s+/g, '').toUpperCase();
     myNickname = (nickInput && nickInput.trim()) ? nickInput.trim() : '플레이어';
 
-    if (rawInput) {
-        myRoomCode = rawInput.trim().toUpperCase();
+    if (myRoomCode) {
         socket.emit('joinRoom', { roomCode: myRoomCode, nickname: myNickname });
         
         document.getElementById('lobby').style.display = 'none';

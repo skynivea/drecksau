@@ -16,65 +16,42 @@ body {
 
 .main-container {
     width: 100%;
-    max-width: 1000px;
-    padding: 20px;
+    max-width: 950px;
+    padding: 15px;
 }
 
-/* 카드 패널 (로비/대기실) */
 .card-panel {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
-    padding: 40px;
+    padding: 35px;
     text-align: center;
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    max-width: 480px;
+    max-width: 450px;
     margin: 0 auto;
-    backdrop-filter: blur(10px);
 }
 
-.game-title {
-    font-size: 32px;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
+.game-title { font-size: 30px; color: #2c3e50; margin-bottom: 6px; }
+.subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 25px; }
 
-.subtitle {
-    color: #7f8c8d;
-    font-size: 14px;
-    margin-bottom: 30px;
-}
-
-.action-box {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.input-group {
-    display: flex;
-    gap: 10px;
-}
+.action-box { display: flex; flex-direction: column; gap: 12px; }
 
 input[type="text"] {
-    flex: 1;
-    padding: 12px 16px;
-    font-size: 16px;
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
-    text-transform: uppercase;
     text-align: center;
-    letter-spacing: 2px;
     outline: none;
     transition: border 0.2s;
 }
 
-input[type="text"]:focus {
-    border-color: #2a5298;
-}
+input[type="text"]:focus { border-color: #2a5298; }
 
-/* 버튼 스타일 */
+.input-group { display: flex; gap: 8px; }
+
 .btn {
-    padding: 12px 20px;
+    padding: 12px 18px;
     font-size: 15px;
     font-weight: bold;
     border: none;
@@ -83,122 +60,90 @@ input[type="text"]:focus {
     transition: all 0.2s ease;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-}
-
 .btn-primary { background: #2a5298; color: white; }
 .btn-secondary { background: #34495e; color: white; }
 .btn-success { background: #2ecc71; color: white; }
 .btn-warning { background: #e67e22; color: white; font-size: 13px; }
-.btn-large { width: 100%; padding: 15px; font-size: 18px; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+.btn-large { width: 100%; padding: 14px; font-size: 17px; }
 
-.divider {
-    position: relative;
-    text-align: center;
-    margin: 10px 0;
-}
-.divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: #ddd;
-}
-.divider span {
-    position: relative;
-    background: #fff;
-    padding: 0 10px;
-    color: #999;
-    font-size: 12px;
-}
+.divider { position: relative; text-align: center; margin: 5px 0; }
+.divider::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #ddd; }
+.divider span { position: relative; background: #fff; padding: 0 10px; color: #999; font-size: 12px; }
 
-/* 대기실 배지 */
-.room-code-badge {
-    background: #f8f9fa;
-    border: 2px dashed #2a5298;
-    border-radius: 12px;
-    padding: 15px;
-    margin: 20px 0;
-}
-.room-code-badge span { display: block; font-size: 12px; color: #666; }
-.room-code-badge strong { font-size: 32px; color: #2a5298; letter-spacing: 4px; }
+.room-code-badge { background: #f8f9fa; border: 2px dashed #2a5298; border-radius: 12px; padding: 12px; margin: 15px 0; }
+.room-code-badge span { font-size: 12px; color: #666; }
+.room-code-badge strong { font-size: 28px; color: #2a5298; letter-spacing: 4px; display: block; }
 
-.status-box { margin-bottom: 25px; }
-.highlight { font-size: 20px; font-weight: bold; color: #e74c3c; }
-.notice-text { font-size: 13px; color: #7f8c8d; margin-top: 5px; }
+.player-list { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+.player-chip { background: #eef2f3; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 14px; text-align: left; }
+.player-chip.is-host::after { content: ' 👑 방장'; color: #f39c12; font-size: 12px; }
 
 /* 게임 보드 레이아웃 */
 #game-board {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.97);
     border-radius: 20px;
-    width: 100%;
-    min-height: 85vh;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
+    gap: 15px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
-#top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #eee;
-}
+#top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.info-badge { font-weight: bold; font-size: 15px; }
 
-.info-badge { font-weight: bold; color: #333; }
-.turn-badge {
-    background: #2196F3;
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 14px;
+/* 직관적인 턴 배너 */
+.turn-banner {
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 16px;
     font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.turn-my-turn { background: #e74c3c; animation: pulseTurn 1.5s infinite; }
+.turn-other-turn { background: #3498db; }
+
+@keyframes pulseTurn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
 }
 
-#opponents-area {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 15px 0;
-}
+#opponents-area { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 
 .opponent-box {
     background: #f8f9fa;
-    border: 2px solid #e0e0e0;
+    border: 3px solid #e0e0e0;
     border-radius: 12px;
     padding: 10px;
     text-align: center;
     flex: 1;
-    max-width: 250px;
+    min-width: 220px;
+    transition: all 0.3s;
 }
 
 .opponent-box.active-turn {
     border-color: #e74c3c;
-    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
+    background: #fff5f5;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
 }
 
 #center-area {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 25px;
-    margin: 20px 0;
+    gap: 20px;
     background: #f1f2f6;
-    padding: 15px;
-    border-radius: 15px;
+    padding: 12px;
+    border-radius: 12px;
 }
 
-/* 카드 및 돼지 스타일 */
+/* 일반 손 카드 (세로: 80x115) */
 .card {
-    width: 80px; 
-    height: 115px; 
+    width: 75px; 
+    height: 110px; 
     border-radius: 8px;
     background-size: cover; 
     background-position: center;
@@ -206,16 +151,65 @@ input[type="text"]:focus {
     display: inline-block; 
     margin: 4px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transition: all 0.2s;
-    border: 1px solid rgba(0,0,0,0.1);
+    transition: transform 0.2s, border 0.2s;
+    border: 2px solid transparent;
 }
-
-.card:hover { transform: translateY(-5px); }
-.card.selected { transform: translateY(-15px); border: 3px solid #e74c3c; }
-
+.card:hover { transform: translateY(-4px); }
+.card.selected { transform: translateY(-12px); border-color: #e74c3c; box-shadow: 0 8px 16px rgba(231,76,60,0.4); }
 .card-back { background: #2c3e50; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-/* 카드 이미지 설정 */
+/* 1. 돼지 카드 (가로 형태: 110x75) */
+.pig-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin: 4px;
+}
+
+.pig-card {
+    width: 110px;
+    height: 75px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #ccc;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.pig-container:hover .pig-card {
+    transform: scale(1.05);
+    border-color: #2980b9;
+}
+
+/* 타겟 선택 중 가시성 강조 */
+.target-selectable .pig-card {
+    border-color: #2ecc71;
+    box-shadow: 0 0 10px #2ecc71;
+    animation: targetGlow 1s infinite alternate;
+}
+
+@keyframes targetGlow {
+    from { box-shadow: 0 0 5px #2ecc71; }
+    to { box-shadow: 0 0 12px #2ecc71; }
+}
+
+/* 돼지 오버레이 배지 (클릭 간섭 방지 pointer-events: none 적용) */
+.overlay-badge {
+    position: absolute;
+    padding: 2px 5px;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    border-radius: 4px;
+    pointer-events: none; /* 핵심: 클릭 이벤트가 돼지 카드로 직접 전달되게 함 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.badge-barn { top: 4px; left: 4px; background: #8d6e63; }
+.badge-rod { top: 4px; right: 4px; background: #f1c40f; color: #000; }
+.badge-lock { bottom: 4px; left: 4px; background: #34495e; }
+
+/* 카드 이미지 매핑 */
 .card-mud { background-image: url('images/mud.png'); }
 .card-rain { background-image: url('images/rain.png'); }
 .card-lightning { background-image: url('images/lightning.png'); }
@@ -224,40 +218,40 @@ input[type="text"]:focus {
 .card-lightning_rod { background-image: url('images/lightning_rod.png'); }
 .card-mockery { background-image: url('images/mockery.png'); }
 
-.pig-container { position: relative; display: inline-block; }
 .pig-clean { background-image: url('images/clean_pig.png'); }
 .pig-dirty { background-image: url('images/dirty_pig.png'); }
 
-/* 배지 오버레이 */
-.overlay-badge {
-    position: absolute;
-    padding: 2px 4px;
-    font-size: 9px;
-    font-weight: bold;
-    color: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.badge-barn { top: 6px; left: 6px; background: #8d6e63; }
-.badge-rod { top: 6px; right: 6px; background: #fbc02d; color: #000; }
-.badge-lock { bottom: 6px; left: 6px; background: #607d8b; }
-
 #my-area {
     background: #eef2f3;
-    padding: 15px;
-    border-radius: 15px;
+    padding: 12px;
+    border-radius: 12px;
     text-align: center;
 }
 
-.section-title {
-    font-size: 13px;
-    color: #666;
-    font-weight: bold;
-    margin-bottom: 8px;
+.section-title { font-size: 13px; color: #555; font-weight: bold; margin-bottom: 6px; }
+.pig-zone, .hand-zone { display: flex; justify-content: center; flex-wrap: wrap; align-items: center; }
+
+/* 5. 채팅 영역 */
+#chat-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 5px;
 }
 
-.pig-zone, .hand-zone {
+#chat-messages {
+    height: 100px;
+    overflow-y: auto;
+    font-size: 13px;
+    text-align: left;
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 5px;
 }
+
+.chat-msg { background: #f1f2f6; padding: 4px 8px; border-radius: 6px; }
+.chat-msg strong { color: #2a5298; }
+.chat-input-row { display: flex; gap: 8px; margin-top: 8px; }
+.chat-input-row input { text-align: left; padding: 8px 12px; font-size: 13px; }

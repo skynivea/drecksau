@@ -14,10 +14,12 @@
             <p class="subtitle">모든 돼지를 진흙탕에 구르게 만드세요!</p>
             
             <div class="action-box">
-                <button onclick="createRoom()" class="btn btn-primary btn-large">✨ 새 방 만들기 (방장)</button>
+                <input type="text" id="nicknameInput" placeholder="내 닉네임 입력 (최대 8자)" maxlength="8">
+                
+                <button onclick="createRoom()" class="btn btn-primary btn-large">✨ 새 방 만들기</button>
                 <div class="divider"><span>또는</span></div>
                 <div class="input-group">
-                    <input type="text" id="roomInput" placeholder="4자리 방 코드 입력" maxlength="4">
+                    <input type="text" id="roomInput" placeholder="4자리 방 코드" maxlength="4">
                     <button onclick="joinRoom()" class="btn btn-secondary">방 참가</button>
                 </div>
             </div>
@@ -32,7 +34,8 @@
             </div>
             
             <div class="status-box">
-                <p>현재 접속 인원: <span id="player-count" class="highlight">1</span> / 4 명</p>
+                <p>참여 플레이어 (<span id="player-count">1</span>/4)</p>
+                <div id="waiting-player-list" class="player-list"></div>
                 <p id="host-notice" class="notice-text">방장이 게임을 시작할 때까지 대기하세요.</p>
             </div>
 
@@ -43,23 +46,35 @@
         <div id="game-board" style="display: none;">
             <div id="top-bar">
                 <div class="info-badge">방 코드: <b id="board-room-code"></b></div>
-                <div id="turn-indicator" class="turn-badge">대기 중...</div>
+                <div id="turn-banner" class="turn-banner">차례 확인 중...</div>
             </div>
             
+            <!-- 상대방 돼지 구역 -->
             <div id="opponents-area"></div>
 
+            <!-- 중앙 카드 및 덱 -->
             <div id="center-area">
                 <div id="deck" class="card card-back"><span>덱</span></div>
                 <div id="played-card-display" class="card-slot"></div>
-                <button id="discard-btn" onclick="discardHand()" class="btn btn-warning">카드 3장 새로 뽑기 (손털기)</button>
+                <button id="discard-btn" onclick="discardHand()" class="btn btn-warning">카드 3장 다 버리기 (턴 소모)</button>
             </div>
 
+            <!-- 내 상태 및 핸드 -->
             <div id="my-area">
-                <div class="section-title">내 돼지 상태</div>
+                <div class="section-title" id="my-name-display">내 돼지</div>
                 <div id="my-pigs" class="pig-zone"></div>
                 
-                <div class="section-title">내 핸드 카드 (카드를 누른 뒤 대상을 선택하세요)</div>
+                <div class="section-title">내 손의 카드 (사용할 카드를 먼저 누르고 대상을 선택하세요)</div>
                 <div id="my-hand" class="hand-zone"></div>
+            </div>
+
+            <!-- 실시간 채팅창 -->
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <div class="chat-input-row">
+                    <input type="text" id="chatInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key==='Enter') sendChat()">
+                    <button onclick="sendChat()" class="btn btn-primary btn-sm">전송</button>
+                </div>
             </div>
         </div>
     </div>

@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -31,13 +31,10 @@ function checkAndReshuffleDeck(room) {
 }
 
 io.on('connection', (socket) => {
-socket.on('joinRoom', (rawRoomCode) => {
+    socket.on('joinRoom', (rawRoomCode) => {
         if (!rawRoomCode) return;
-
-        // 방 코드 정제 (문자열 변환 + 공백 제거 + 대문자 변환)
         const roomCode = String(rawRoomCode).trim().toUpperCase();
 
-        // 기존에 참여 중이던 소켓 룸이 있다면 이탈 처리
         Array.from(socket.rooms).forEach(r => {
             if (r !== socket.id) socket.leave(r);
         });
@@ -51,14 +48,14 @@ socket.on('joinRoom', (rawRoomCode) => {
                 discard: [], 
                 turn: 0, 
                 centerCard: null, 
-                isStarted: false 
+                isStarted: false,
+                hostId: socket.id
             };
         }
         
         const room = rooms[roomCode];
-
-        // 이미 참여 중인 플레이어인지 체크하여 중복 추가 방지
         const existingPlayer = room.players.find(p => p.id === socket.id);
+        
         if (!existingPlayer) {
             if (room.players.length >= 4 || room.isStarted) {
                 socket.emit('errorMsg', '입장할 수 없는 방입니다.');
@@ -68,13 +65,19 @@ socket.on('joinRoom', (rawRoomCode) => {
             room.players.push(newPlayer);
         }
         
-        // 방에 있는 모든 유저에게 인원 수 및 정보 갱신 신호 전송
         io.to(roomCode).emit('updateState', room);
     });
 
-    socket.on('startGame', (roomCode) => {
+    socket.on('startGame', (rawRoomCode) => {
+        const roomCode = String(rawRoomCode).trim().toUpperCase();
         const room = rooms[roomCode];
-        if (!room || room.players.length < 2) {
+
+        if (!room) return;
+        if (room.hostId !== socket.id) {
+            socket.emit('errorMsg', '방장만 게임을 시작할 수 있습니다.');
+            return;
+        }
+        if (room.players.length < 2) {
             socket.emit('errorMsg', '최소 2명 이상 모여야 시작할 수 있습니다.');
             return;
         }
@@ -101,7 +104,8 @@ socket.on('joinRoom', (rawRoomCode) => {
         io.to(roomCode).emit('updateState', room);
     });
 
-    socket.on('playCard', ({ roomCode, cardIdx, targetPlayerId, targetPigIdx }) => {
+    socket.on('playCard', ({ roomCode: rawCode, cardIdx, targetPlayerId, targetPigIdx }) => {
+        const roomCode = String(rawCode).trim().toUpperCase();
         const room = rooms[roomCode];
         if (!room || !room.isStarted) return;
         
@@ -115,10 +119,9 @@ socket.on('joinRoom', (rawRoomCode) => {
         const card = player.hand[cardIdx];
         let isValidMove = false;
 
-        let targetPlayer = room.players.find(p => p.id === targetPlayerId);
-        let targetPig = (targetPlayer && targetPigIdx !== undefined) ? targetPlayer.pigs[targetPigIdx] : null;
+        const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+        const targetPig = (targetPlayer && targetPigIdx !== undefined) ? targetPlayer.pigs[targetPigIdx] : null;
 
-        // 카드 효과 판정 로직
         if (card === 'mud') {
             if (targetPlayerId === player.id && targetPig && !targetPig.isDirty) {
                 targetPig.isDirty = true;
@@ -171,7 +174,7 @@ socket.on('joinRoom', (rawRoomCode) => {
 
             const isWin = player.pigs.length > 0 && player.pigs.every(pig => pig.isDirty);
             if (isWin) {
-                io.to(roomCode).emit('gameOver', `${player.id} 님이 승리했습니다!`);
+                io.to(roomCode).emit('gameOver', `플레이어 (${playerIdx + 1}) 님이 승리했습니다!`);
                 delete rooms[roomCode];
                 return;
             }
@@ -183,13 +186,16 @@ socket.on('joinRoom', (rawRoomCode) => {
         }
     });
 
-    // 손털기 (사용 가능한 카드가 없을 때 3장 모두 버리고 뽑기)
-    socket.on('discardHand', ({ roomCode }) => {
+    socket.on('discardHand', ({ roomCode: rawCode }) => {
+        const roomCode = String(rawCode).trim().toUpperCase();
         const room = rooms[roomCode];
         if (!room || !room.isStarted) return;
         
         const playerIdx = room.players.findIndex(p => p.id === socket.id);
-        if (playerIdx !== room.turn) return;
+        if (playerIdx !== room.turn) {
+            socket.emit('errorMsg', '당신의 차례가 아닙니다!');
+            return;
+        }
 
         const player = room.players[playerIdx];
         room.discard.push(...player.hand);
@@ -214,6 +220,14 @@ socket.on('joinRoom', (rawRoomCode) => {
                 if (room.players.length === 0) {
                     delete rooms[roomCode];
                 } else {
+                    if (room.hostId === socket.id) {
+                        room.hostId = room.players[0].id;
+                    }
+                    if (room.isStarted && room.players.length === 1) {
+                        io.to(roomCode).emit('gameOver', '상대방이 나가 홀로 남았습니다. 승리!');
+                        delete rooms[roomCode];
+                        return;
+                    }
                     if (room.turn >= room.players.length) room.turn = 0;
                     io.to(roomCode).emit('updateState', room);
                 }
@@ -225,5 +239,5 @@ socket.on('joinRoom', (rawRoomCode) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+    console.log(`Server running on port ${PORT}`);
 });

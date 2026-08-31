@@ -31,9 +31,10 @@ function checkAndReshuffleDeck(room) {
 }
 
 io.on('connection', (socket) => {
-    socket.on('joinRoom', (rawRoomCode) => {
-        if (!rawRoomCode) return;
-        const roomCode = String(rawRoomCode).trim().toUpperCase();
+    socket.on('joinRoom', ({ roomCode: rawCode, nickname }) => {
+        if (!rawCode) return;
+        const roomCode = String(rawCode).trim().toUpperCase();
+        const userNickname = (nickname && nickname.trim()) ? nickname.trim() : '익명';
 
         Array.from(socket.rooms).forEach(r => {
             if (r !== socket.id) socket.leave(r);
@@ -41,7 +42,6 @@ io.on('connection', (socket) => {
 
         socket.join(roomCode);
 
-        // 방이 없으면 새로 만들고 접속자를 방장(hostId)으로 지정
         if (!rooms[roomCode]) {
             rooms[roomCode] = { 
                 players: [], 
@@ -63,10 +63,11 @@ io.on('connection', (socket) => {
                 socket.leave(roomCode);
                 return;
             }
-            room.players.push({ id: socket.id, hand: [], pigs: [] });
+            room.players.push({ id: socket.id, nickname: userNickname, hand: [], pigs: [] });
+        } else {
+            existingPlayer.nickname = userNickname;
         }
         
-        // 방 안의 모든 유저에게 상태 갱신 전송
         io.to(roomCode).emit('updateState', room);
     });
 
@@ -122,7 +123,8 @@ io.on('connection', (socket) => {
         let isValidMove = false;
 
         const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-        const targetPig = (targetPlayer && targetPigIdx !== undefined) ? targetPlayer.pigs[targetPigIdx] : null;
+        const pigIdx = parseInt(targetPigIdx, 10);
+        const targetPig = (targetPlayer && !isNaN(pigIdx) && targetPlayer.pigs[pigIdx]) ? targetPlayer.pigs[pigIdx] : null;
 
         if (card === 'mud') {
             if (targetPlayerId === player.id && targetPig && !targetPig.isDirty) {
@@ -176,7 +178,7 @@ io.on('connection', (socket) => {
 
             const isWin = player.pigs.length > 0 && player.pigs.every(pig => pig.isDirty);
             if (isWin) {
-                io.to(roomCode).emit('gameOver', `플레이어 (${playerIdx + 1}) 님이 승리했습니다!`);
+                io.to(roomCode).emit('gameOver', `🎉 [${player.nickname}] 님이 승리했습니다!`);
                 delete rooms[roomCode];
                 return;
             }
@@ -184,7 +186,7 @@ io.on('connection', (socket) => {
             room.turn = (room.turn + 1) % room.players.length;
             io.to(roomCode).emit('updateState', room);
         } else {
-            socket.emit('errorMsg', '올바른 대상을 선택하세요!');
+            socket.emit('errorMsg', '선택한 카드나 돼지가 규칙에 맞지 않습니다!');
         }
     });
 
@@ -211,6 +213,21 @@ io.on('connection', (socket) => {
         room.centerCard = 'discard_all';
         room.turn = (room.turn + 1) % room.players.length;
         io.to(roomCode).emit('updateState', room);
+    });
+
+    // 실시간 채팅 메시지 수신 및 전달
+    socket.on('sendChat', ({ roomCode: rawCode, message }) => {
+        const roomCode = String(rawCode).trim().toUpperCase();
+        const room = rooms[roomCode];
+        if (!room || !message || !message.trim()) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+        const senderName = player ? player.nickname : '익명';
+
+        io.to(roomCode).emit('receiveChat', {
+            sender: senderName,
+            message: message.trim()
+        });
     });
 
     socket.on('disconnect', () => {

@@ -1,45 +1,87 @@
-body { margin: 0; font-family: 'Malgun Gothic', sans-serif; background-color: #f0f8ff; overflow: hidden; }
-#lobby { text-align: center; margin-top: 20%; }
-#game-board { display: flex; flex-direction: column; justify-content: space-between; height: 100vh; position: relative; }
-#room-info { position: absolute; top: 10px; right: 20px; font-weight: bold; }
-
-/* 중앙 카드 팝업 효과 */
-#center-area {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    display: flex; gap: 20px; align-items: center;
+body { 
+    margin: 0; 
+    font-family: 'Malgun Gothic', sans-serif; 
+    background-color: #f0f8ff; 
+    overflow: hidden; 
 }
-#played-card-display {
-    width: 150px; height: 210px;
-    border: 3px solid gold; box-shadow: 0 0 20px gold; /* 강조 이펙트 */
-    transition: all 0.3s ease;
+
+#lobby, #waiting-room { 
+    text-align: center; 
+    margin-top: 15%; 
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
     background-color: #fff;
-    display: flex; justify-content: center; align-items: center; font-weight: bold;
 }
 
-/* 카드 기본 스타일 */
+.btn-start {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    border: none;
+}
+
+#display-room-code {
+    color: #007bff;
+    font-size: 24px;
+}
+
+#game-board { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    height: 100vh; 
+    position: relative; 
+}
+
+#room-info { 
+    position: absolute; 
+    top: 10px; 
+    right: 20px; 
+    font-weight: bold; 
+}
+
+#center-area {
+    position: absolute; 
+    top: 40%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    display: flex; 
+    gap: 30px; 
+    align-items: center;
+}
+
+#played-card-display {
+    width: 110px; 
+    height: 150px;
+    box-shadow: 0 0 15px gold;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
 .card {
-    width: 100px; height: 140px; border: 1px solid #ccc; border-radius: 8px;
-    background-size: cover; cursor: pointer; display: inline-block; margin: 5px;
-}
-.card:hover { transform: translateY(-10px); }
-.card-back { background-image: url('images/card_back.jpg'); /* 세 번째 사진 뒷면 이미지 경로 */ }
-
-/* 영역 배치 */
-#my-area { text-align: center; padding: 20px; background-color: rgba(0,0,0,0.1); }
-.pig-zone { margin-bottom: 10px; }
-.hand-zone { display: flex; justify-content: center; }
-
-/* --- 여기에 기존 코드들이 있습니다 --- */
-
-/* 카드에 이미지 꽉 차게 설정, 글자 숨기기 */
-.card {
-    width: 100px; height: 140px; border: 1px solid #ccc; border-radius: 8px;
-    background-size: cover; background-position: center;
-    cursor: pointer; display: inline-block; margin: 5px;
-    color: transparent; /* 글자 대신 이미지만 보이게 설정 */
+    width: 100px; 
+    height: 140px; 
+    border: 1px solid #ccc; 
+    border-radius: 8px;
+    background-size: cover; 
+    background-position: center;
+    cursor: pointer; 
+    display: inline-block; 
+    margin: 5px;
 }
 
-/* 플레이 카드 이미지 매핑 */
+.card:hover { 
+    transform: translateY(-8px); 
+}
+
+.card-back { background-color: #336699; }
 .card-mud { background-image: url('images/mud.png'); }
 .card-rain { background-image: url('images/rain.png'); }
 .card-lightning { background-image: url('images/lightning.png'); }
@@ -48,6 +90,16 @@ body { margin: 0; font-family: 'Malgun Gothic', sans-serif; background-color: #f
 .card-lightning_rod { background-image: url('images/lightning_rod.png'); }
 .card-mockery { background-image: url('images/mockery.png'); }
 
-/* 돼지 상태 이미지 매핑 */
 .pig-clean { background-image: url('images/clean_pig.png'); }
 .pig-dirty { background-image: url('images/dirty_pig.png'); }
+
+#my-area { 
+    text-align: center; 
+    padding: 20px; 
+    background-color: rgba(0,0,0,0.05); 
+}
+
+.pig-zone, .hand-zone { 
+    display: flex; 
+    justify-content: center; 
+}

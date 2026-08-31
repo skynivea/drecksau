@@ -11,6 +11,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
 
+const CARD_NAMES = {
+    mud: '진흙탕 뿜기',
+    rain: '소나기',
+    barn: '헛간 짓기',
+    lightning: '벼락 치기',
+    lightning_rod: '피뢰침 설치',
+    mockery: '목욕 시키기',
+    lock: '헛간 문 잠금'
+};
+
 function createDeck() {
     const deck = [];
     for(let i = 0; i < 21; i++) deck.push('mud');
@@ -171,6 +181,24 @@ io.on('connection', (socket) => {
             room.discard.push(card);
             room.centerCard = card;
 
+            // 행동 알림 패킷 방송
+            const cardKorean = CARD_NAMES[card] || card;
+            let actionMsg = '';
+            if (card === 'rain') {
+                actionMsg = `🌧️ [${player.nickname}]님이 [소나기]를 내렸습니다! (모든 헛간 없는 돼지가 씻깁니다)`;
+            } else if (targetPlayerId === player.id) {
+                actionMsg = `✨ [${player.nickname}]님이 자신의 돼지에게 [${cardKorean}]을(를) 사용했습니다.`;
+            } else {
+                actionMsg = `💥 [${player.nickname}]님이 [${targetPlayer.nickname}]님의 돼지에게 [${cardKorean}] 공격!`;
+            }
+
+            io.to(roomCode).emit('actionNotice', {
+                actor: player.nickname,
+                cardKorean: cardKorean,
+                target: targetPlayer ? targetPlayer.nickname : '전체',
+                message: actionMsg
+            });
+
             checkAndReshuffleDeck(room);
             if (room.deck.length > 0) {
                 player.hand.push(room.deck.pop());
@@ -211,11 +239,16 @@ io.on('connection', (socket) => {
         }
 
         room.centerCard = 'discard_all';
+
+        io.to(roomCode).emit('actionNotice', {
+            actor: player.nickname,
+            message: `🔄 [${player.nickname}]님이 손의 카드를 모두 버리고 새로 뽑았습니다.`
+        });
+
         room.turn = (room.turn + 1) % room.players.length;
         io.to(roomCode).emit('updateState', room);
     });
 
-    // 실시간 채팅 메시지 수신 및 전달
     socket.on('sendChat', ({ roomCode: rawCode, message }) => {
         const roomCode = String(rawCode).trim().toUpperCase();
         const room = rooms[roomCode];

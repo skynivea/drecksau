@@ -8,21 +8,27 @@
 <body>
     <div id="lobby">
         <h1>Drecksau Deluxe</h1>
+        <button onclick="createRoom()" class="btn">새 방 만들기</button>
+        <br><br>
         <input type="text" id="roomInput" placeholder="방 코드 입력">
-        <button onclick="joinRoom()">게임 참가</button>
+        <button onclick="joinRoom()" class="btn">방 참가</button>
+    </div>
+
+    <div id="waiting-room" style="display: none;">
+        <h2>게임 대기실</h2>
+        <p>방 코드: <b id="display-room-code"></b></p>
+        <p>현재 접속 인원: <span id="player-count">1</span>명</p>
+        <button id="start-btn" onclick="startGame()" class="btn btn-start">게임 시작하기</button>
     </div>
 
     <div id="game-board" style="display: none;">
-        <div id="room-info">방 코드: <span id="display-room"></span></div>
+        <div id="room-info">방 코드: <span id="board-room-code"></span></div>
         
         <div id="center-area">
-            <div id="deck" class="card-back">덱</div>
-            <div id="played-card-display">
-                </div>
+            <div id="deck" class="card card-back"></div>
+            <div id="played-card-display"></div>
         </div>
 
-        <div id="opponents-area"></div>
-        
         <div id="my-area">
             <div id="my-pigs" class="pig-zone"></div>
             <div id="my-hand" class="hand-zone"></div>

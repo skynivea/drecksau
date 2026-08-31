@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 액션 알림 팝업 오버레이 -->
+    <div id="action-toast" class="toast-hidden">
+        <span id="toast-text"></span>
+    </div>
+
     <div class="main-container">
         <!-- 로비 화면 -->
         <div id="lobby" class="card-panel">
@@ -68,11 +73,11 @@
                 <div id="my-hand" class="hand-zone"></div>
             </div>
 
-            <!-- 실시간 채팅창 -->
+            <!-- 실시간 채팅창 및 행동 로그 -->
             <div id="chat-container">
                 <div id="chat-messages"></div>
                 <div class="chat-input-row">
-                    <input type="text" id="chatInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key==='Enter') sendChat()">
+                    <input type="text" id="chatInput" placeholder="메시지 입력..." onkeydown="if(event.key==='Enter') sendChat()">
                     <button onclick="sendChat()" class="btn btn-primary btn-sm">전송</button>
                 </div>
             </div>

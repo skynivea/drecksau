@@ -23,6 +23,13 @@ function createDeck() {
     return deck.sort(() => Math.random() - 0.5);
 }
 
+function checkAndReshuffleDeck(room) {
+    if (room.deck.length === 0 && room.discard.length > 0) {
+        room.deck = room.discard.sort(() => Math.random() - 0.5);
+        room.discard = [];
+    }
+}
+
 io.on('connection', (socket) => {
     socket.on('joinRoom', (roomCode) => {
         socket.join(roomCode);
@@ -69,6 +76,7 @@ io.on('connection', (socket) => {
             
             player.hand = [];
             for(let i = 0; i < 3; i++) {
+                checkAndReshuffleDeck(room);
                 if(room.deck.length > 0) player.hand.push(room.deck.pop());
             }
         });
@@ -77,33 +85,124 @@ io.on('connection', (socket) => {
         io.to(roomCode).emit('updateState', room);
     });
 
-    socket.on('playCard', ({ roomCode, cardIdx }) => {
+    socket.on('playCard', ({ roomCode, cardIdx, targetPlayerId, targetPigIdx }) => {
         const room = rooms[roomCode];
-        if (!room || !room.isStarted || room.players[room.turn].id !== socket.id) return;
-
-        const player = room.players[room.turn];
-        const playedCard = player.hand.splice(cardIdx, 1)[0];
+        if (!room || !room.isStarted) return;
         
-        room.centerCard = playedCard; 
+        const playerIdx = room.players.findIndex(p => p.id === socket.id);
+        if (playerIdx !== room.turn) {
+            socket.emit('errorMsg', '당신의 차례가 아닙니다!');
+            return;
+        }
 
-        if (playedCard === 'rain') {
+        const player = room.players[playerIdx];
+        const card = player.hand[cardIdx];
+        let isValidMove = false;
+
+        let targetPlayer = room.players.find(p => p.id === targetPlayerId);
+        let targetPig = (targetPlayer && targetPigIdx !== undefined) ? targetPlayer.pigs[targetPigIdx] : null;
+
+        // 카드 효과 판정 로직
+        if (card === 'mud') {
+            if (targetPlayerId === player.id && targetPig && !targetPig.isDirty) {
+                targetPig.isDirty = true;
+                isValidMove = true;
+            }
+        } else if (card === 'rain') {
             room.players.forEach(p => {
                 p.pigs.forEach(pig => {
                     if (!pig.hasBarn) pig.isDirty = false;
                 });
             });
-        }
-        
-        if (room.deck.length > 0) {
-            player.hand.push(room.deck.pop());
+            isValidMove = true;
+        } else if (card === 'barn') {
+            if (targetPlayerId === player.id && targetPig && !targetPig.hasBarn) {
+                targetPig.hasBarn = true;
+                isValidMove = true;
+            }
+        } else if (card === 'lightning') {
+            if (targetPlayerId !== player.id && targetPig && targetPig.hasBarn && !targetPig.hasLightningRod) {
+                targetPig.hasBarn = false;
+                targetPig.hasLock = false;
+                isValidMove = true;
+            }
+        } else if (card === 'lightning_rod') {
+            if (targetPlayerId === player.id && targetPig && targetPig.hasBarn && !targetPig.hasLightningRod) {
+                targetPig.hasLightningRod = true;
+                isValidMove = true;
+            }
+        } else if (card === 'mockery') {
+            if (targetPlayerId !== player.id && targetPig && targetPig.hasBarn && targetPig.isDirty && !targetPig.hasLock) {
+                targetPig.isDirty = false;
+                isValidMove = true;
+            }
+        } else if (card === 'lock') {
+            if (targetPlayerId === player.id && targetPig && targetPig.hasBarn && !targetPig.hasLock) {
+                targetPig.hasLock = true;
+                isValidMove = true;
+            }
         }
 
-        const isWin = player.pigs.length > 0 && player.pigs.every(pig => pig.isDirty);
-        if (isWin) {
-            io.to(roomCode).emit('gameOver', `${socket.id} 님이 승리했습니다!`);
-        } else {
+        if (isValidMove) {
+            player.hand.splice(cardIdx, 1);
+            room.discard.push(card);
+            room.centerCard = card;
+
+            checkAndReshuffleDeck(room);
+            if (room.deck.length > 0) {
+                player.hand.push(room.deck.pop());
+            }
+
+            const isWin = player.pigs.length > 0 && player.pigs.every(pig => pig.isDirty);
+            if (isWin) {
+                io.to(roomCode).emit('gameOver', `${player.id} 님이 승리했습니다!`);
+                delete rooms[roomCode];
+                return;
+            }
+
             room.turn = (room.turn + 1) % room.players.length;
             io.to(roomCode).emit('updateState', room);
+        } else {
+            socket.emit('errorMsg', '올바른 대상을 선택하세요!');
+        }
+    });
+
+    // 손털기 (사용 가능한 카드가 없을 때 3장 모두 버리고 뽑기)
+    socket.on('discardHand', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.isStarted) return;
+        
+        const playerIdx = room.players.findIndex(p => p.id === socket.id);
+        if (playerIdx !== room.turn) return;
+
+        const player = room.players[playerIdx];
+        room.discard.push(...player.hand);
+        player.hand = [];
+
+        for (let i = 0; i < 3; i++) {
+            checkAndReshuffleDeck(room);
+            if (room.deck.length > 0) player.hand.push(room.deck.pop());
+        }
+
+        room.centerCard = 'discard_all';
+        room.turn = (room.turn + 1) % room.players.length;
+        io.to(roomCode).emit('updateState', room);
+    });
+
+    socket.on('disconnect', () => {
+        for (const roomCode in rooms) {
+            const room = rooms[roomCode];
+            const idx = room.players.findIndex(p => p.id === socket.id);
+            if (idx !== -1) {
+                room.players.splice(idx, 1);
+                if (room.players.length === 0) {
+                    delete rooms[roomCode];
+                } else {
+                    if (room.turn >= room.players.length) room.turn = 0;
+                    io.to(roomCode).emit('updateState', room);
+                }
+                break;
+            }
         }
     });
 });

@@ -17,25 +17,36 @@ socket.on('updateState', (room) => {
     myId = socket.id;
     const me = room.players.find(p => p.id === myId);
     
-    // 내 핸드 렌더링
+    // 1. 내 돼지들 렌더링
+    const pigsDiv = document.getElementById('my-pigs');
+    pigsDiv.innerHTML = '';
+    me.pigs.forEach((pig, idx) => {
+        const pigElem = document.createElement('div');
+        // 더럽냐 깨끗하냐에 따라 클래스(이미지) 다르게 적용
+        pigElem.className = 'card ' + (pig.isDirty ? 'pig-dirty' : 'pig-clean'); 
+        pigsDiv.appendChild(pigElem);
+    });
+
+    // 2. 내 핸드 카드 렌더링
     const handDiv = document.getElementById('my-hand');
     handDiv.innerHTML = '';
-    me.hand.forEach((card, idx) => {
+    me.hand.forEach((cardName, idx) => {
         const cardElem = document.createElement('div');
-        cardElem.className = 'card';
-        cardElem.innerText = card; // 실제 구현시에는 background-image로 이미지 교체
+        // 예: card-mud, card-rain 클래스 적용
+        cardElem.className = 'card card-' + cardName; 
         cardElem.onclick = () => playMyCard(idx);
         handDiv.appendChild(cardElem);
     });
 
-    // 중앙에 플레이된 카드 표시 (모두가 볼 수 있게)
+    // 3. 중앙에 플레이된 카드 표시
     const centerDisplay = document.getElementById('played-card-display');
     if (room.centerCard) {
-        centerDisplay.innerText = room.centerCard;
+        centerDisplay.className = 'card card-' + room.centerCard;
         centerDisplay.style.opacity = 1;
-        // 일정 시간 후 사라지게 하려면 setTimeout 사용
+        centerDisplay.style.border = "none"; // 이미지가 꽉 차게 테두리 제거
     } else {
         centerDisplay.style.opacity = 0;
+        centerDisplay.className = ''; 
     }
 });
 

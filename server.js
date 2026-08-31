@@ -87,6 +87,9 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3000, () => {
-    console.log('서버가 http://localhost:3000 에서 실행 중입니다.');
+// 기존: server.listen(3000, () => { ... });
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+});
 });

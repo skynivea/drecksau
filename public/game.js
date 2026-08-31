@@ -10,10 +10,12 @@ function createRoom() {
 }
 
 function joinRoom() {
-    const input = document.getElementById('roomInput').value;
-    if(input) {
-        myRoomCode = input;
+    const rawInput = document.getElementById('roomInput').value;
+    if (rawInput) {
+        // 공백 제거 및 대문자 강제 변환
+        myRoomCode = rawInput.trim().toUpperCase(); 
         socket.emit('joinRoom', myRoomCode);
+        
         document.getElementById('lobby').style.display = 'none';
         document.getElementById('waiting-room').style.display = 'block';
         document.getElementById('display-room-code').innerText = myRoomCode;

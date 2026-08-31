@@ -41,6 +41,7 @@ io.on('connection', (socket) => {
 
         socket.join(roomCode);
 
+        // 방이 없으면 새로 만들고 접속자를 방장(hostId)으로 지정
         if (!rooms[roomCode]) {
             rooms[roomCode] = { 
                 players: [], 
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
                 turn: 0, 
                 centerCard: null, 
                 isStarted: false,
-                hostId: socket.id
+                hostId: socket.id 
             };
         }
         
@@ -58,13 +59,14 @@ io.on('connection', (socket) => {
         
         if (!existingPlayer) {
             if (room.players.length >= 4 || room.isStarted) {
-                socket.emit('errorMsg', '입장할 수 없는 방입니다.');
+                socket.emit('errorMsg', '입장할 수 없는 방이거나 이미 게임이 시작되었습니다.');
+                socket.leave(roomCode);
                 return;
             }
-            const newPlayer = { id: socket.id, hand: [], pigs: [] };
-            room.players.push(newPlayer);
+            room.players.push({ id: socket.id, hand: [], pigs: [] });
         }
         
+        // 방 안의 모든 유저에게 상태 갱신 전송
         io.to(roomCode).emit('updateState', room);
     });
 
@@ -74,7 +76,7 @@ io.on('connection', (socket) => {
 
         if (!room) return;
         if (room.hostId !== socket.id) {
-            socket.emit('errorMsg', '방장만 게임을 시작할 수 있습니다.');
+            socket.emit('errorMsg', '방장만 게임을 시작할 수 있습니다!');
             return;
         }
         if (room.players.length < 2) {
@@ -237,10 +239,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// 기존 코드
-// server.listen(PORT, () => { ... });
-
-// ▼ 수정된 코드 (Render 감지용 0.0.0.0 추가)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);

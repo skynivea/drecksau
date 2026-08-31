@@ -2,44 +2,65 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>드렉사우 디럭스</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>드렉사우 디럭스 (Drecksau Deluxe)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="lobby">
-        <h1>Drecksau Deluxe</h1>
-        <button onclick="createRoom()" class="btn">새 방 만들기</button>
-        <br><br>
-        <input type="text" id="roomInput" placeholder="방 코드 입력">
-        <button onclick="joinRoom()" class="btn">방 참가</button>
-    </div>
-
-    <div id="waiting-room" style="display: none;">
-        <h2>게임 대기실</h2>
-        <p>방 코드: <b id="display-room-code"></b></p>
-        <p>현재 접속 인원: <span id="player-count">1</span>명</p>
-        <button id="start-btn" onclick="startGame()" class="btn btn-start">게임 시작하기</button>
-    </div>
-
-    <div id="game-board" style="display: none;">
-        <div id="top-bar">
-            <span>방 코드: <b id="board-room-code"></b></span>
-            <span id="turn-indicator"></span>
-        </div>
-        
-        <div id="opponents-area"></div>
-
-        <div id="center-area">
-            <div id="deck" class="card card-back">덱</div>
-            <div id="played-card-display"></div>
-            <button id="discard-btn" onclick="discardHand()" class="btn btn-warning">낼 카드 없음 (전부 버리기)</button>
+    <div class="main-container">
+        <!-- 로비 화면 -->
+        <div id="lobby" class="card-panel">
+            <h1 class="game-title">🐷 Drecksau Deluxe</h1>
+            <p class="subtitle">모든 돼지를 진흙탕에 구르게 만드세요!</p>
+            
+            <div class="action-box">
+                <button onclick="createRoom()" class="btn btn-primary btn-large">✨ 새 방 만들기 (방장)</button>
+                <div class="divider"><span>또는</span></div>
+                <div class="input-group">
+                    <input type="text" id="roomInput" placeholder="4자리 방 코드 입력" maxlength="4">
+                    <button onclick="joinRoom()" class="btn btn-secondary">방 참가</button>
+                </div>
+            </div>
         </div>
 
-        <div id="my-area">
-            <h3>내 돼지</h3>
-            <div id="my-pigs" class="pig-zone"></div>
-            <h3>내 손에 든 카드 (클릭 후 대상 지정)</h3>
-            <div id="my-hand" class="hand-zone"></div>
+        <!-- 대기실 화면 -->
+        <div id="waiting-room" class="card-panel" style="display: none;">
+            <h2>🎮 게임 대기실</h2>
+            <div class="room-code-badge">
+                <span>방 코드</span>
+                <strong id="display-room-code">----</strong>
+            </div>
+            
+            <div class="status-box">
+                <p>현재 접속 인원: <span id="player-count" class="highlight">1</span> / 4 명</p>
+                <p id="host-notice" class="notice-text">방장이 게임을 시작할 때까지 대기하세요.</p>
+            </div>
+
+            <button id="start-btn" onclick="startGame()" class="btn btn-success btn-large" style="display: none;">🚀 게임 시작하기</button>
+        </div>
+
+        <!-- 게임 본 화면 -->
+        <div id="game-board" style="display: none;">
+            <div id="top-bar">
+                <div class="info-badge">방 코드: <b id="board-room-code"></b></div>
+                <div id="turn-indicator" class="turn-badge">대기 중...</div>
+            </div>
+            
+            <div id="opponents-area"></div>
+
+            <div id="center-area">
+                <div id="deck" class="card card-back"><span>덱</span></div>
+                <div id="played-card-display" class="card-slot"></div>
+                <button id="discard-btn" onclick="discardHand()" class="btn btn-warning">카드 3장 새로 뽑기 (손털기)</button>
+            </div>
+
+            <div id="my-area">
+                <div class="section-title">내 돼지 상태</div>
+                <div id="my-pigs" class="pig-zone"></div>
+                
+                <div class="section-title">내 핸드 카드 (카드를 누른 뒤 대상을 선택하세요)</div>
+                <div id="my-hand" class="hand-zone"></div>
+            </div>
         </div>
     </div>
 

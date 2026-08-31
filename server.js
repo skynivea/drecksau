@@ -1,10 +1,14 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path'); // 1. path 모듈 추가
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// 2. absolute path 사용으로 수정
+app.use(express.static(path.join(__dirname, 'public')));
 
 // public 폴더의 정적 파일(HTML, CSS, 이미지) 제공
 app.use(express.static('public')); 

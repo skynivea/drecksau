@@ -31,8 +31,19 @@ function checkAndReshuffleDeck(room) {
 }
 
 io.on('connection', (socket) => {
-    socket.on('joinRoom', (roomCode) => {
+socket.on('joinRoom', (rawRoomCode) => {
+        if (!rawRoomCode) return;
+
+        // 방 코드 정제 (문자열 변환 + 공백 제거 + 대문자 변환)
+        const roomCode = String(rawRoomCode).trim().toUpperCase();
+
+        // 기존에 참여 중이던 소켓 룸이 있다면 이탈 처리
+        Array.from(socket.rooms).forEach(r => {
+            if (r !== socket.id) socket.leave(r);
+        });
+
         socket.join(roomCode);
+
         if (!rooms[roomCode]) {
             rooms[roomCode] = { 
                 players: [], 
@@ -45,14 +56,19 @@ io.on('connection', (socket) => {
         }
         
         const room = rooms[roomCode];
-        if (room.players.length >= 4 || room.isStarted) {
-            socket.emit('errorMsg', '입장할 수 없는 방입니다.');
-            return;
-        }
 
-        const newPlayer = { id: socket.id, hand: [], pigs: [] };
-        room.players.push(newPlayer);
+        // 이미 참여 중인 플레이어인지 체크하여 중복 추가 방지
+        const existingPlayer = room.players.find(p => p.id === socket.id);
+        if (!existingPlayer) {
+            if (room.players.length >= 4 || room.isStarted) {
+                socket.emit('errorMsg', '입장할 수 없는 방입니다.');
+                return;
+            }
+            const newPlayer = { id: socket.id, hand: [], pigs: [] };
+            room.players.push(newPlayer);
+        }
         
+        // 방에 있는 모든 유저에게 인원 수 및 정보 갱신 신호 전송
         io.to(roomCode).emit('updateState', room);
     });
 

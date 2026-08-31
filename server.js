@@ -165,9 +165,9 @@ io.on('connection', (socket) => {
                 isValidMove = true;
             }
         } else if (card === 'mockery') {
-            if (targetPlayerId !== player.id && targetPig && targetPig.hasBarn && targetPig.isDirty && !targetPig.hasLock) {
-                targetPig.isDirty = false;
-                isValidMove = true;
+            if (targetPlayerId !== player.id && targetPig && targetPig.isDirty && !targetPig.hasLock) {
+        targetPig.isDirty = false;
+        isValidMove = true;
             }
         } else if (card === 'lock') {
             if (targetPlayerId === player.id && targetPig && targetPig.hasBarn && !targetPig.hasLock) {

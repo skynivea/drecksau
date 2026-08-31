@@ -40,11 +40,22 @@ io.on('connection', (socket) => {
         const newPlayer = { id: socket.id, hand: [], pigs: [] };
         room.players.push(newPlayer);
         
-        // 인원수에 따른 돼지 지급 (2명:5장, 3명:4장, 4명:3장) - 임시로 시작 시 분배 로직
-        const pigCount = room.players.length === 2 ? 5 : room.players.length === 3 ? 4 : 3;
-        // 초기화 (실제 게임 시작 버튼을 누를 때 갱신되도록 확장 가능)
+       const pigCount = room.players.length === 2 ? 5 : room.players.length === 3 ? 4 : 3;
         
-        io.to(roomCode).emit('updateState', room);
+        // 처음 시작할 때 깨끗한 돼지들 생성
+        const initialPigs = [];
+        for(let i=0; i<pigCount; i++) {
+            initialPigs.push({ isDirty: false, hasBarn: false, hasLightningRod: false, hasLock: false });
+        }
+
+        // 손에 쥘 카드 3장 뽑기
+        const initialHand = [];
+        for(let i=0; i<3; i++) {
+            if(room.deck.length > 0) initialHand.push(room.deck.pop());
+        }
+
+        const newPlayer = { id: socket.id, hand: initialHand, pigs: initialPigs };
+        room.players.push(newPlayer);
     });
 
     socket.on('playCard', ({ roomCode, cardIdx, targetInfo }) => {

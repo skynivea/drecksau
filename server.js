@@ -237,7 +237,11 @@ io.on('connection', (socket) => {
     });
 });
 
+// 기존 코드
+// server.listen(PORT, () => { ... });
+
+// ▼ 수정된 코드 (Render 감지용 0.0.0.0 추가)
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });

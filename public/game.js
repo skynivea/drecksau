@@ -12,10 +12,8 @@ function createRoom() {
 function joinRoom() {
     const rawInput = document.getElementById('roomInput').value;
     if (rawInput) {
-        // 공백 제거 및 대문자 강제 변환
-        myRoomCode = rawInput.trim().toUpperCase(); 
+        myRoomCode = rawInput.trim().toUpperCase();
         socket.emit('joinRoom', myRoomCode);
-        
         document.getElementById('lobby').style.display = 'none';
         document.getElementById('waiting-room').style.display = 'block';
         document.getElementById('display-room-code').innerText = myRoomCode;
@@ -30,14 +28,12 @@ function startGame() {
 function selectCard(idx, cardName) {
     selectedCardIdx = idx;
     
-    // 비 카드는 대상을 지정하지 않고 바로 발동
     if (cardName === 'rain') {
         socket.emit('playCard', { roomCode: myRoomCode, cardIdx: idx });
         selectedCardIdx = null;
         return;
     }
 
-    // UI 즉시 업데이트하여 선택 상태 표시
     const handCards = document.querySelectorAll('#my-hand .card');
     handCards.forEach((c, i) => {
         if (i === idx) c.classList.add('selected');
@@ -106,17 +102,20 @@ socket.on('updateState', (room) => {
     myId = socket.id;
     document.getElementById('player-count').innerText = room.players.length;
 
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.style.display = (room.hostId === myId) ? 'inline-block' : 'none';
+    }
+
     if (room.isStarted) {
         document.getElementById('waiting-room').style.display = 'none';
         document.getElementById('game-board').style.display = 'flex';
 
-        // 1. 턴 표시
         const currentTurnPlayer = room.players[room.turn];
-        const isMyTurn = currentTurnPlayer.id === myId;
+        const isMyTurn = currentTurnPlayer && currentTurnPlayer.id === myId;
         document.getElementById('turn-indicator').innerText = isMyTurn ? 
             '★ 내 차례입니다! ★' : `${room.turn + 1}번 플레이어 차례 대기 중...`;
 
-        // 2. 상대방 돼지 렌더링
         const oppArea = document.getElementById('opponents-area');
         oppArea.innerHTML = '';
         room.players.forEach((player, idx) => {
@@ -135,7 +134,6 @@ socket.on('updateState', (room) => {
             }
         });
 
-        // 3. 내 돼지 및 핸드 렌더링
         const me = room.players.find(p => p.id === myId);
         if (me) {
             const myPigZone = document.getElementById('my-pigs');
@@ -154,7 +152,6 @@ socket.on('updateState', (room) => {
             });
         }
 
-        // 4. 중앙 필드 카드
         const centerDisplay = document.getElementById('played-card-display');
         if (room.centerCard) {
             if (room.centerCard === 'discard_all') {
@@ -171,5 +168,14 @@ socket.on('updateState', (room) => {
     }
 });
 
-socket.on('errorMsg', (msg) => { alert(msg); });
-socket.on('gameOver', (msg) => { alert(msg); location.reload(); });
+socket.on('errorMsg', (msg) => { 
+    alert(msg); 
+    selectedCardIdx = null; 
+    const handCards = document.querySelectorAll('#my-hand .card');
+    handCards.forEach(c => c.classList.remove('selected'));
+});
+
+socket.on('gameOver', (msg) => { 
+    alert(msg); 
+    location.reload(); 
+});

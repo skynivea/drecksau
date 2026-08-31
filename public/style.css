@@ -1,8 +1,8 @@
 body { 
     margin: 0; 
     font-family: 'Malgun Gothic', sans-serif; 
-    background-color: #f0f8ff; 
-    overflow: hidden; 
+    background-color: #f4f7f6; 
+    user-select: none;
 }
 
 #lobby, #waiting-room { 
@@ -19,16 +19,16 @@ body {
     background-color: #fff;
 }
 
-.btn-start {
-    background-color: #4CAF50;
+.btn-start { background-color: #4CAF50; color: white; border: none; font-size: 18px; }
+.btn-warning { background-color: #ff9800; color: white; border: none; }
+
+#top-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: #333;
     color: white;
     font-size: 18px;
-    border: none;
-}
-
-#display-room-code {
-    color: #007bff;
-    font-size: 24px;
 }
 
 #game-board { 
@@ -36,38 +36,46 @@ body {
     flex-direction: column; 
     justify-content: space-between; 
     height: 100vh; 
-    position: relative; 
 }
 
-#room-info { 
-    position: absolute; 
-    top: 10px; 
-    right: 20px; 
-    font-weight: bold; 
+#opponents-area {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background: #e9ecef;
+}
+
+.opponent-box {
+    text-align: center;
+    border: 2px solid #ccc;
+    padding: 5px;
+    border-radius: 8px;
+    background: white;
+}
+
+.opponent-box.active-turn {
+    border-color: #ff4757;
+    box-shadow: 0 0 10px #ff4757;
 }
 
 #center-area {
-    position: absolute; 
-    top: 40%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
     display: flex; 
-    gap: 30px; 
+    gap: 20px; 
+    justify-content: center;
     align-items: center;
 }
 
 #played-card-display {
-    width: 110px; 
-    height: 150px;
-    box-shadow: 0 0 15px gold;
+    width: 90px; 
+    height: 130px;
+    box-shadow: 0 0 10px gold;
     border-radius: 8px;
-    transition: all 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #fff;
 }
 
 .card {
-    width: 100px; 
-    height: 140px; 
+    width: 90px; 
+    height: 130px; 
     border: 1px solid #ccc; 
     border-radius: 8px;
     background-size: cover; 
@@ -75,13 +83,17 @@ body {
     cursor: pointer; 
     display: inline-block; 
     margin: 5px;
+    transition: transform 0.2s;
 }
 
-.card:hover { 
-    transform: translateY(-8px); 
+.card.selected {
+    transform: translateY(-15px);
+    border: 3px solid #ff4757;
 }
 
-.card-back { background-color: #336699; }
+.card-back { background-color: #2e86de; color: white; text-align: center; line-height: 130px; }
+
+/* 카드 이미지 매핑 */
 .card-mud { background-image: url('images/mud.png'); }
 .card-rain { background-image: url('images/rain.png'); }
 .card-lightning { background-image: url('images/lightning.png'); }
@@ -90,13 +102,32 @@ body {
 .card-lightning_rod { background-image: url('images/lightning_rod.png'); }
 .card-mockery { background-image: url('images/mockery.png'); }
 
+/* 돼지 오버레이 스타일 */
+.pig-container {
+    position: relative;
+    display: inline-block;
+}
+
 .pig-clean { background-image: url('images/clean_pig.png'); }
 .pig-dirty { background-image: url('images/dirty_pig.png'); }
 
+.overlay-badge {
+    position: absolute;
+    padding: 2px 5px;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    border-radius: 3px;
+}
+
+.badge-barn { top: 5px; left: 5px; background: #8b4513; }
+.badge-rod { top: 5px; right: 5px; background: #f1c40f; color: black; }
+.badge-lock { bottom: 5px; left: 5px; background: #7f8c8d; }
+
 #my-area { 
     text-align: center; 
-    padding: 20px; 
-    background-color: rgba(0,0,0,0.05); 
+    padding: 10px; 
+    background-color: #dcdde1; 
 }
 
 .pig-zone, .hand-zone { 

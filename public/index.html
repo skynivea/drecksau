@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>드렉사우 디럭스</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="lobby">
+        <h1>Drecksau Deluxe</h1>
+        <input type="text" id="roomInput" placeholder="방 코드 입력">
+        <button onclick="joinRoom()">게임 참가</button>
+    </div>
+
+    <div id="game-board" style="display: none;">
+        <div id="room-info">방 코드: <span id="display-room"></span></div>
+        
+        <div id="center-area">
+            <div id="deck" class="card-back">덱</div>
+            <div id="played-card-display">
+                </div>
+        </div>
+
+        <div id="opponents-area"></div>
+        
+        <div id="my-area">
+            <div id="my-pigs" class="pig-zone"></div>
+            <div id="my-hand" class="hand-zone"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

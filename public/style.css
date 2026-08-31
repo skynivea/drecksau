@@ -1,99 +1,221 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body { 
-    margin: 0; 
-    font-family: 'Malgun Gothic', sans-serif; 
-    background-color: #f4f7f6; 
-    user-select: none;
-}
-
-#lobby, #waiting-room { 
-    text-align: center; 
-    margin-top: 15%; 
-}
-
-.btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-}
-
-.btn-start { background-color: #4CAF50; color: white; border: none; font-size: 18px; }
-.btn-warning { background-color: #ff9800; color: white; border: none; }
-
-#top-bar {
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #333;
+    min-height: 100vh;
     display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background: #333;
-    color: white;
-    font-size: 18px;
-}
-
-#game-board { 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-between; 
-    height: 100vh; 
-}
-
-#opponents-area {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px;
-    background: #e9ecef;
-}
-
-.opponent-box {
-    text-align: center;
-    border: 2px solid #ccc;
-    padding: 5px;
-    border-radius: 8px;
-    background: white;
-}
-
-.opponent-box.active-turn {
-    border-color: #ff4757;
-    box-shadow: 0 0 10px #ff4757;
-}
-
-#center-area {
-    display: flex; 
-    gap: 20px; 
     justify-content: center;
     align-items: center;
 }
 
-#played-card-display {
-    width: 90px; 
-    height: 130px;
-    box-shadow: 0 0 10px gold;
-    border-radius: 8px;
-    background-color: #fff;
+.main-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
 }
 
+/* 카드 패널 (로비/대기실) */
+.card-panel {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    max-width: 480px;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+}
+
+.game-title {
+    font-size: 32px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.action-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 2px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #2a5298;
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.btn-primary { background: #2a5298; color: white; }
+.btn-secondary { background: #34495e; color: white; }
+.btn-success { background: #2ecc71; color: white; }
+.btn-warning { background: #e67e22; color: white; font-size: 13px; }
+.btn-large { width: 100%; padding: 15px; font-size: 18px; }
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 10px 0;
+}
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #ddd;
+}
+.divider span {
+    position: relative;
+    background: #fff;
+    padding: 0 10px;
+    color: #999;
+    font-size: 12px;
+}
+
+/* 대기실 배지 */
+.room-code-badge {
+    background: #f8f9fa;
+    border: 2px dashed #2a5298;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px 0;
+}
+.room-code-badge span { display: block; font-size: 12px; color: #666; }
+.room-code-badge strong { font-size: 32px; color: #2a5298; letter-spacing: 4px; }
+
+.status-box { margin-bottom: 25px; }
+.highlight { font-size: 20px; font-weight: bold; color: #e74c3c; }
+.notice-text { font-size: 13px; color: #7f8c8d; margin-top: 5px; }
+
+/* 게임 보드 레이아웃 */
+#game-board {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    width: 100%;
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+#top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.info-badge { font-weight: bold; color: #333; }
+.turn-badge {
+    background: #2196F3;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#opponents-area {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.opponent-box {
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    flex: 1;
+    max-width: 250px;
+}
+
+.opponent-box.active-turn {
+    border-color: #e74c3c;
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
+}
+
+#center-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 20px 0;
+    background: #f1f2f6;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+/* 카드 및 돼지 스타일 */
 .card {
-    width: 90px; 
-    height: 130px; 
-    border: 1px solid #ccc; 
+    width: 80px; 
+    height: 115px; 
     border-radius: 8px;
     background-size: cover; 
     background-position: center;
     cursor: pointer; 
     display: inline-block; 
-    margin: 5px;
-    transition: transform 0.2s;
+    margin: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 
-.card.selected {
-    transform: translateY(-15px);
-    border: 3px solid #ff4757;
-}
+.card:hover { transform: translateY(-5px); }
+.card.selected { transform: translateY(-15px); border: 3px solid #e74c3c; }
 
-.card-back { background-color: #2e86de; color: white; text-align: center; line-height: 130px; }
+.card-back { background: #2c3e50; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-/* 카드 이미지 매핑 */
+/* 카드 이미지 설정 */
 .card-mud { background-image: url('images/mud.png'); }
 .card-rain { background-image: url('images/rain.png'); }
 .card-lightning { background-image: url('images/lightning.png'); }
@@ -102,35 +224,40 @@ body {
 .card-lightning_rod { background-image: url('images/lightning_rod.png'); }
 .card-mockery { background-image: url('images/mockery.png'); }
 
-/* 돼지 오버레이 스타일 */
-.pig-container {
-    position: relative;
-    display: inline-block;
-}
-
+.pig-container { position: relative; display: inline-block; }
 .pig-clean { background-image: url('images/clean_pig.png'); }
 .pig-dirty { background-image: url('images/dirty_pig.png'); }
 
+/* 배지 오버레이 */
 .overlay-badge {
     position: absolute;
-    padding: 2px 5px;
-    font-size: 10px;
+    padding: 2px 4px;
+    font-size: 9px;
     font-weight: bold;
     color: white;
-    border-radius: 3px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.badge-barn { top: 6px; left: 6px; background: #8d6e63; }
+.badge-rod { top: 6px; right: 6px; background: #fbc02d; color: #000; }
+.badge-lock { bottom: 6px; left: 6px; background: #607d8b; }
+
+#my-area {
+    background: #eef2f3;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
 }
 
-.badge-barn { top: 5px; left: 5px; background: #8b4513; }
-.badge-rod { top: 5px; right: 5px; background: #f1c40f; color: black; }
-.badge-lock { bottom: 5px; left: 5px; background: #7f8c8d; }
-
-#my-area { 
-    text-align: center; 
-    padding: 10px; 
-    background-color: #dcdde1; 
+.section-title {
+    font-size: 13px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
-.pig-zone, .hand-zone { 
-    display: flex; 
-    justify-content: center; 
+.pig-zone, .hand-zone {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
